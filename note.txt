@@ -1,0 +1,42 @@
+android 中布局优化的实用原则：
+	1, 尽量多使用RelativeLayout, 减少使用绝对布局AbsoluteLayout;
+	2, 将可复用的组件抽取出来并通过<include/> 标签使用;
+	3, 使用<ViewStub/>标签来加载一些不常用的布局;
+	4, 使用<merge/>标签减少布局的嵌套层次.
+		<merge/> 的使用长用于：
+			1)当xml文件的根布局上FrameLayout时，可以使用merge作为根节点
+			2)当用include标签导入一个共用布局时，如果父布局和子布局根节点为同一类型，
+			  可以使用merge将子节点布局的内容合并包含到父布局中，这样可以减少一级嵌套层次。
+			  
+
+/**
+* 显示或隐藏软键盘
+*/
+private void onFocusChange(boolean hasFocus){ 
+	final boolean isFocus = hasFocus;
+	(new Handler()).postDelayed(new Runnable() { 
+		public void run() {
+			InputMethodManager imm = (InputMethodManager) 
+			content.getContext().getSystemService(INPUT_METHOD_SERVICE); 
+			if(isFocus) {
+				//显示输入法
+				imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+			}else{
+				//隐藏输入法
+				imm.hideSoftInputFromWindow(content.getWindowToken(),0);
+			} 
+		} 
+	}, 10);
+}
+
+2015/12/07
+	Android为什么要设计出Bundle而不是直接使用HashMap来进行数据传递:
+		1,Bundle内部是由ArrayMap实现的. ArrayMap的内部实现是二个数组，一个int数组是存储对象数据对应下标，一个对象数组保存key和value
+		  内部使用二分法对key进行排序，所以在添加，删除，查找数据的时候，都会使用二分查找，只适合小数据量操作.
+		  如果在数据量比较大的情况下，那么它的性能将退化，而HashMap内部则是数组+链表结构，所以在数据量较少的时候，HashMapde的Entry 
+		  Array比ArrayMap占用更多的内存，因为使用Bundle的场景大多数为小数据量，我没见过在两个Activity之间传递10个以上数据的场景，所以
+		  相比之下，在这种情况下使用ArrayMap保存数据，在操作速度和内存占用上都具有优势，因此使用Bundle来传递数据，可以保证更快的速度和
+		  更少的内存占用.
+		2,另外一个原因，则是在Android中如果使用Intent来携带数据的话，需要数据是基本数据类型或者可序列化类型,HashMap使用serializable来进行序列化的,
+		  而Bundle则是使用Parcelable进行序列化。而在Android平台中, 更推荐使用Parcelable实现序列化,虽然写法复杂，但是开销更小,所以为了更加快速的
+		  进行数据的序列化和反序列化. 系统封装了Bundle类,方便我们进行数据的传输.
