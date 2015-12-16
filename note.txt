@@ -424,3 +424,56 @@ private void onFocusChange(boolean hasFocus){
 					PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat("y", 100f);
 					ObjectAnimator.ofPropertyValuesHolder(myView, pvhX, pvyY).start();
 					myView.animate().x(50f).y(100f);
+					
+					
+2015/12/11
+		如何限制只能输入指定的字符：
+			设置android:digits属性即可, ex：android:digits="abcdef"
+		
+			在代码中实现:
+				第一种: 
+				   EditText mEditText = (EditText)findViewById(R.id.myEditText);
+				   String digits = "abcdef";
+				   mEditText.setKeyListener(DigitsKeyListener.getInstance(digits));
+				第二种:
+					EditText mEditText = (EditText)findViewById(R.id.myEditText);
+					InputFilter[] filters = new InputFilter[1];
+					filters[0] = new MyInputFilter("abcdef");
+					mEditText.setFilters(filters);
+					public class MyInputFilter extends LoginFilter.UsernameFilterGeneric {
+						private String mAllowedDigits;
+
+						public PopInputFilter( String digits ) {
+							mAllowedDigits = digits;
+						}
+
+						@Override
+						public boolean isAllowed(char c) {
+							if (mAllowedDigits.indexOf(c) != -1) {
+								return true;
+							} 
+								return false;
+						}
+					}
+					
+					
+2015/12/16
+		模拟用户按下hone键: (摘录于 http://blog.csdn.net/yy1300326388/article/details/50311879)
+			Intent intent = new Intent(Intent.ACTION_MAIN);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.addCategory(Intent.CATEGORY_HOME)；
+			statrtActivity(intent);
+			
+		时区转换:
+			public static String dateTZ2Normal(String datetime){
+				try{
+					SimpleDateFormat formatTZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+					formatTZ.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+					SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					Date TZDate = formatTZ.parse(datetime);
+					return format.format(TZDate);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				return "";
+			}
