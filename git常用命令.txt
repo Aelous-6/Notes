@@ -229,3 +229,18 @@
 	10,其他
 		# 生成一个可供发布的压缩包
 		$ git archive
+		
+git fetch的简单用法: 更新远程代码到本地仓库
+	方式一:
+		1,查看远程仓库: git remote -v
+		2,从远程仓库获取最新版本到本地: git fetch origin master
+		3,比较本地的仓库和远程仓库的区别: git log -p master.. origin/master
+		4,把远程下载下来的代码合并到本地仓库，远程的和本地的合并: git merge origin/master
+		
+	方式二:
+		1,查看远程分支: git remote -v
+		2,从远程获取最新版本到本地: git fetch origin master:temp(从远处origin仓库的master分支下载到本地并新建一个分支temp)
+		3,比较本地的仓库和远程仓库的区别 : git diff temp
+		4,合并temp分支到master分支: git merge temp
+		5,如果不想要temp分支了，可以删除此分支: git branch -D temp
+		
