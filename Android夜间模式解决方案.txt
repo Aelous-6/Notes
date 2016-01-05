@@ -1,0 +1,99 @@
+业内关于夜间模式的实现，有二种主流方案，另外还有一种其他方案:
+	方案一: 通过切换theme来实现夜间模式
+			1,首先在attrs.xml文件中，为需要随theme变换的内容定义属性;
+				<?xml version="1.0" encoding="utf-8">
+				<resources>
+					<attr name="textColor" format="color|format"></attr>
+					<attr name="mainBackground" format="color|format"></attr>
+				</resources>
+			2,在不同的theme中，对属性设置不同的值,在styles.xml中定义theme
+				<?xml version="1.0" encoding="utf-8">
+				<resources>
+					<style name="ThemeDefault" parent="Theme.AppCompat.Light.DarkActionBar">
+						<item name="mainBackground">#ffffff</item>
+						<item name="textColor">#000000</item>
+					</style>
+					<style name="ThemeNight" parent="Theme.AppCompat.Light.DarkActionBar">
+						<item name="mainBackground">#000000</item>
+						<item name="textColor">#ffffff</item>
+					</style>
+				</resources>
+			3,在布局文件中使用对应的值，通过 ?attr/属性名,来获取不同theme对应的值
+				android:textColor="?attr/textColor"
+			4,在Activity中调用如下changeTheme方法,其中isNightMode为一个全局变量用来标记当前是否为夜间模式,在设置完theme后，还
+			  需要调用restartActivity或者setContentView重新绘制ui
+				public void changeTheme(){
+					if(isNightMode){
+						setTheme(R.style.ThemeDefault);
+						isNightMode = false;
+					}else{
+						setTheme(R.style.ThemeNight);
+						isNightMode = true;
+					}
+					setContentView(R.layout.activity_main);
+				}
+				
+		方案分析:
+				google官方推荐的方式,但是这种方式有一些不足, 规模较大的应用,需要随theme变化的属性会很多,都需要逐一定义，
+				有点麻烦,另外一个缺点就是要使得新theme生效,一般都需要restartActivity来切换UI，会导致切换主题时界面闪烁
+				只要需要协商一堆updateTheme方法:
+					private void updateTheme(){
+						TypedValue typedValue = new TypedValue();
+						Resources.Theme theme = getTheme();
+						theme.resolveAttribute(R.attr.textColor,typedValue,true);
+						findViewById(R.id.button).setBackgroundColor(typedValue.data);
+						theme.resolveAttribute(R.attr.mainBackground,typedValue,true);
+						findViewById(R.id.main_screen).setBackgroundColor(typedValue.data);
+					}
+	
+	方案二: 通过资源ID映射的方式实现夜间模式
+		通过ID获取资源时,先将其转换问夜间模式对应ID，再通过Resources来获取对应的资源.
+			public static Drawable getDrawable(Context context,int id){
+				return context.getResources().getDrawable(getResId(id));
+			}
+			
+			public static int getResId(int defaultResId){
+				if(!isNightMode()){
+					return defaultResId;
+				}
+				if(sResourceMap == null){
+					buildResourceMap();
+				}
+				int themeResId = sResourceMap.get(defaultResId);
+				return themeResId == 0 ? defaultResId :themeResId;
+			}
+			
+		这里是通过HashMap将白天模式的resID和夜间模式的resID来一一对应起来的.
+			private static void buildResourceMap(){
+				sResourceMap = new SparseIntArray();
+				sResourceMap.put(R.drawable.common_background, R.drawable.common_background_night);
+				//...
+			}
+	
+		方案分析: 这个方案简单粗暴,麻烦的地方和第一种方案一样,每次添加资源都需要建立映射关系，
+				刷新UI的方式也与第一种方案类似,貌似主流新闻阅读软件使用这种方式
+	
+	
+	方案三: 通过修改uiMode来切换夜间模式
+		首先将获取资源的地方统一起来,使用Application对应的Resources,在Application的onCreate中调用ResourcesManager的init方法将其初始化
+			public static init(Context context){
+				sRes = context.getResources();
+			}
+		
+		切换夜间模式时,通过更新uiMode来更新Resources的配置,系统会更加其uiMode读取对应night下的资源,同时在res中给夜间模式的资源添加 -night 后缀
+			public static void updateNightMode(boolean on){
+				DisplayMetrics dm = sRes.getDisplayMetrics();
+				Configuration config = sRes.getConfiguration();
+				config.uiMode &= ~Configuration.UI_MODE_NIGHT_MASK;
+				config.uiMode |= on ? Configuration.UI_MODE_NIGHT_YES : Configuration.UI_MODE_NIGHT_NO;
+				sRes.updateConfiguration(config,dm);
+			}
+		
+		方案分析: 对于Android的资源读取,可以参考老罗的博客<Android应用程序资源的查找过程>. 这种方法相对前二种的好处
+				就是资源添加非常简单清晰,但ui上的更新还是无法做到非常顺滑的切换.
+				
+	
+	对于如何发现第三中方案的过程:
+		UIModeManagerService的setNightMode()方法中可以看到会调用updateLocked()方法,在该方法中更新了Configuration的uiMode，该变量为public的
+		
+		
