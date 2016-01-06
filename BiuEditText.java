@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
@@ -19,9 +20,6 @@ import android.widget.TextView;
 
 import java.util.Random;
 
-/**
- * Created by james on 22/11/15.
- */
 public class BiuEditText extends EditText {
     private ViewGroup contentContainer;
     private int height;
@@ -59,9 +57,16 @@ public class BiuEditText extends EditText {
         });
     }
 
+    /**
+     * 按键键位变化更新
+     *
+     * @param last 最后一个字符
+     * @param isUp true 字符输入
+     *             false 字符退出
+     */
     private void update(char last, boolean isUp) {
         final TextView textView = new TextView(getContext());
-        textView.setTextColor(getResources().getColor(android.R.color.holo_green_light));
+        textView.setTextColor(Color.rgb((int) (Math.random() * 255 + 1), (int) (Math.random() * 255 + 1), (int) (Math.random() * 255 + 1)));
         textView.setTextSize(30);
         textView.setText(String.valueOf(last));
         textView.setGravity(Gravity.CENTER);
@@ -116,8 +121,7 @@ public class BiuEditText extends EditText {
 
 
     private void init() {
-        this.setBackgroundColor(Color.argb(66,255,255,255));
-        contentContainer = (ViewGroup) ((MainActivity) getContext()).findViewById(android.R.id.content);
+        contentContainer = (ViewGroup) ((Activity) getContext()).findViewById(android.R.id.content);
         WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         height = windowManager.getDefaultDisplay().getHeight();
     }
