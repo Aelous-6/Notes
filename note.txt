@@ -666,3 +666,64 @@ private void onFocusChange(boolean hasFocus){
 				Socket:
 					学过计算机网络的对Socket不陌生，所以不需要详细讲述。只需要注意，Android不允许在主线程中请求网络，而且请求网络必须要注意声明相应的permission。
 					然后，在服务器中定义ServerSocket来监听端口，客户端使用Socket来请求端口，连通后就可以进行通信。
+					
+2016/01/07	
+		Ashmem(Anonymous Shared Memory)Android系统匿名共享内存:
+			它以驱动程序的形式实现在内核空间中,它有二个特点, 一是能够辅助内存管理系统来有效管理不再使用的内存块,二是它通过Binder进程间通信机制
+			来实现内存共享.
+		
+		Android 沉浸式状态栏:
+						android:fitsSystemWindows="true"
+						http://blog.csdn.net/lmj623565791/article/details/48649563;
+						http://blog.csdn.net/ys408973279/article/details/49994407
+		ScrollView嵌套ListView，ListView嵌套ListView显示不完整和滑动冲突的问题: 
+				对于ScrollView嵌套ListView： 
+					在一个滑动布局中添加一个滑动控件,滑动空间的高度因为不能计算,所以只能显示一个Item.
+							1) 自定义ListView，重写omMeasure方法
+								 @Override  
+								protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {  
+									int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2,  
+											MeasureSpec.AT_MOST);  
+									super.onMeasure(widthMeasureSpec, expandSpec);  
+								}
+							2) 重新计算ListView的高度
+								public static void setListViewHeightBasedOnChildren(ListView listView) {  
+									ListAdapter listAdapter = listView.getAdapter();  
+									if (listAdapter == null) {  
+										return;  
+									}  
+							  
+									int totalHeight = 0;  
+									for (int i = 0; i < listAdapter.getCount(); i++) {  
+										View listItem = listAdapter.getView(i, null, listView);  
+										listItem.measure(0, 0);  
+										totalHeight += listItem.getMeasuredHeight();  
+									}  
+							  
+									ViewGroup.LayoutParams params = listView.getLayoutParams();  
+									params.height = totalHeight  
+											+ (listView.getDividerHeight() * (listAdapter.getCount() - 1));  
+									listView.setLayoutParams(params);  
+								}  
+				对于ListView嵌套ListView:自定义ListView	重写 onInterceptTouchEvent方法:
+								switch (ev.getAction()) {  
+									// 当手指触摸listview时，让父控件交出ontouch权限,不能滚动  
+									case MotionEvent.ACTION_DOWN:  
+										setParentScrollAble(false);  
+									case MotionEvent.ACTION_MOVE:  
+										break;  
+									case MotionEvent.ACTION_UP:  
+									case MotionEvent.ACTION_CANCEL:  
+										// 当手指松开时，让父控件重新获取onTouch权限  
+										setParentScrollAble(true);  
+										break;  
+							  
+									}  
+									return super.onInterceptTouchEvent(ev);  
+								}
+								
+								// 设置父控件是否可以获取到触摸处理权限  
+								private void setParentScrollAble(boolean flag) {  
+									getParent().requestDisallowInterceptTouchEvent(!flag);  
+								}  
+				http://blog.csdn.net/zhaokaiqiang1992/article/details/38585547
