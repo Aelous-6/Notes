@@ -1,0 +1,44 @@
+Android开发生僻却实用的知识点:
+	Tidbit 1:
+		在Android Studio中有一个asset生成器可以生成常用的Action Bar，[File] -> [New] -> {Image Asset}
+	Tidbit 2:
+		单独运行一个Gradle测试: ./gradlew testDebug --tests='*.<testname>'
+	Tidbit 3:
+		使用Strict模式以确保没有在主线程做某些不该做的事情(如耗时的任务,网络访问等),注意- 应用的非Debug版本,
+		即Release版本所用的代码必须把Strict模式关掉,要不然会影响应用性能甚至导致崩溃
+		if(BuildConfig.DEBUG){
+			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+					.detectAll()
+					.penaltyLog()
+					.build());
+			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+						.detectAll()
+						.penaltyLog()
+						.penaltyDeathOnNetWork()
+						.build());
+		}
+	Tidbit 4:
+		在使用Picasso的时候可以设置RequestTransformer以修改请求的Url,比如，我们可以添加图片的宽高到Url参数中
+	Tidbit 5:
+		如果你有在manifest中为某个Activity设置android:windowSoftInputMode="adjustResize",那么ScrollView(或其他可以滚动的
+		ViewGroup) 会收缩以显示软键盘.但如果你在Activity的Theme中设置了android:windowFullscreen="true",ScrollView就不会这样了
+		因为此时ScrollView已经被甚至为填充满整个屏幕.此外，在Theme中设置android:fitSystemWindows="false" 也会使adjustResize失效.
+	Tidbit 6:
+		在应用的运行过程中如果 Android 系统决定要更新系统的 WebView，那你的应用可能会发生崩溃，
+		详情: http://stackoverflow.com/questions/29575313/namenotfoundexception-webview
+	Tidbit 7:
+		即使你已经在Adapter里将List中的某一项Item移出，getChildLayoutPosition还是会返回position值,
+		这是因为被移除的View可能还处于显示移除动画的状态,因此还存在于RecyclerView之中.
+	Tidbit 8:
+		GET_ACCOUNTS这个运行权限不能通过权限页面将它在API-23之前的设备中设置为关闭,(事实上,如果这是联系人组唯一的权限
+		你甚至不能在联系人组里看到这个权限成为一个可选选项).由于这个细节,假设account存在而导致的崩溃的例子实在是太多了.
+	Tidbit 10:
+		使用 23.0.0 开发库时使用 Loader 的话要注意：由于 Fragment 和 Activity 交互的方式被改变了，当手机方向改变，
+		发生横竖屏切换时会发生一个 Bug，使 loader 被丢失。在 support 23.1.0 中这个 Bug 被修复了，然而，
+		当 Loader 在子 Fragment 中被使用是，方向改变还是会出现这个 Bug。所以现在唯一的解决办法就是使用 23.0.0 之前的库。
+	Tidbit 11:
+		在方法返回一个空集合的时候尽可能使用 Collections.emptyList() 和 Collections.emptySet()。
+		Collection 类会返回一个单例空 list 或 set，这样我们就不需要总是创建新的空集合，浪费内存了
+		
+	
+			
