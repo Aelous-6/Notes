@@ -1,0 +1,26 @@
+添加依赖：
+	compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
+	
+注意点(2.0):
+	1,baseUrl方法是必须的.
+	2,baseurl对于的主机地址必须以‘/’结束
+	3,必须添加.addConverterFactory(GsonConverterFactory.create())
+
+introduction：
+	retrofit将http api 指向到java 接口上.
+		public interface GitHubService{
+			@GET("users/{user}/repos")
+			Call<List<Repo>> listRepos(@Path("user") string user);
+		}
+	
+	retrofit 类将生成GitHubService接口的实现
+		Retrofit retrofit = new Retrofit.Builder()
+								.baseUrl("http://api.github.com")
+								.build();
+		GitHubService service = retrofit.create(GitHubService.class);
+		
+	创建后的GitHubService可以通过listRepos方法返回Call，来发出一条同步或异步的http请求到远程webserver.
+		Call<List<Repo>> repos = service.listRepos("octocat");
+		
+		 
