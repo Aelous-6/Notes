@@ -1,0 +1,40 @@
+1,android 4.4版本以上淡化System Bar(status bar and navigation bar)
+		使用可见的view对象调用setSystemUiVisibility(int flag);
+	code:
+		View decorView = getActivity().getWindow().getDecorView();
+		// 淡化 System Bar
+		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+		// 恢复 System Bar 
+		decorView.setSystemUiVisibility(0);
+		
+2, 隐藏status Bar : http://www.jcodecraeer.com/a/anzhuokaifa/developer/2014/1117/1995.html
+
+3, 隐藏navigation Bar : 
+		View decorView = getWindow().getDecorView();
+		// Hide both the navigation bar and the status bar.
+		// SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+		// a general rule, you should design your app to hide the status bar whenever you
+		// hide the navigation bar.
+		int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+					  | View.SYSTEM_UI_FLAG_FULLSCREEN;
+		decorView.setSystemUiVisibility(uiOptions);
+		
+4,	响应ui可见性变化
+		View decorView = getWindow().getDecorView();
+		decorView.setOnSystemUiVisibilityChangeListener
+				(new View.OnSystemUiVisibilityChangeListener() {
+			@Override
+			public void onSystemUiVisibilityChange(int visibility) {
+				// Note that system bars will only be "visible" if none of the
+				// LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
+				if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+					// TODO: The system bars are visible. Make any desired
+					// adjustments to your UI, such as showing the action bar or
+					// other navigational controls.
+				} else {
+					// TODO: The system bars are NOT visible. Make any desired
+					// adjustments to your UI, such as hiding the action bar or
+					// other navigational controls.
+				}
+			}
+		});

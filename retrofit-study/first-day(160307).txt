@@ -4,7 +4,7 @@
 	
 注意点(2.0):
 	1,baseUrl方法是必须的.
-	2,baseurl对于的主机地址必须以‘/’结束
+	2,baseurl对应的主机地址必须以‘/’结束
 	3,必须添加.addConverterFactory(GsonConverterFactory.create())
 
 introduction：
@@ -16,11 +16,44 @@ introduction：
 	
 	retrofit 类将生成GitHubService接口的实现
 		Retrofit retrofit = new Retrofit.Builder()
-								.baseUrl("http://api.github.com")
+								.baseUrl("http://api.github.com/")
 								.build();
 		GitHubService service = retrofit.create(GitHubService.class);
 		
 	创建后的GitHubService可以通过listRepos方法返回Call，来发出一条同步或异步的http请求到远程webserver.
 		Call<List<Repo>> repos = service.listRepos("octocat");
 		
+		
+使用Retrofit 2.0 实现文件上传
+
+	接口实现:
+	public interface CheckIn {
+		@Multipart
+		@POST("/check/checkin.action")
+		Call<ResponseCode> checkIn(@Part("image\"; filename=\"文件名.jpg") RequestBody file);
+	}
+	
+	参数定义:
+	try {
+			Staff staff = (Staff) SharedPreferencesUtils.getObject(context,LoginActivity.LOGIN_USER);
+			RequestBody staffPhone = RequestBody.create(MediaType.parse("text/plain"), staff.getPhone());
+			RequestBody time = RequestBody.create(MediaType.parse("text/plain"), "时间");
+			RequestBody address = RequestBody.create(MediaType.parse("text/plain"), "地点");
+			RequestBody type = RequestBody.create(MediaType.parse("text/plain"), "类型");
+
+			Map<String, RequestBody> map = new HashMap<>();
+			map.put("staffPhone",staffPhone);
+			map.put("checkTime",time);
+			map.put("checkAddress",address);
+			map.put("checkType",type);
+
+			if (imgFile != null) {
+				RequestBody fileBody = RequestBody.create(MediaType.parse("image/png"), imgFile);
+				map.put("image\"; filename=\""+imgFile.getName()+"", fileBody);
+			}
+
+			HttpService.checkIn(map);
+		} catch (IOException e) {
+				e.printStackTrace();
+		}
 		 

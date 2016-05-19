@@ -1,0 +1,10 @@
+RxJava+Retrofit+RxAndroid 组合的问题：
+	1,Caused by: java.lang.IllegalArgumentException:Unable to create call adapter for rx.Observable
+		fix: compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
+		
+	2,retrofit.HttpException: HTTP 404 Not Found
+		fix : retrofit2.0后：BaseUrl要以/结尾，@GET 等请求不要以/开头。
+
+	3,java.lang.AbstractMethodError: abstract method “retrofit.CallAdapter retrofit.CallAdapter$Factory.get
+		fix : 'com.squareup.retrofit:adapter-rxjava:2.0.0-beta1'
+				换为'com.squareup.retrofit:adapter-rxjava:2.0.0-beta2'
