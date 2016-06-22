@@ -1,17 +1,54 @@
-Android NDK����
-1, ��α������ɾ�̬��(.a�ļ�)
-	0x01:	��д��̬���ļ������.h,.c�ļ�
-	0x02:   ����Android.mk�ļ� ��д��������:
+Android NDK开发
+1, 如何编译生成静态库(.a文件)
+	0x00:	编写静态库文件所需的.h,.c文件
+	0x01:   创建Android.mk文件 编写内容如下:
 				LOCAL_PATH := $(call my-dir)
 				include $(CLEAR_VARS)
-				LOCAL_MODULE    := ��̬�������
-				LOCAL_SRC_FILES := ��̬����.c�ļ�����
+				LOCAL_MODULE    := 静态库的名称
+				LOCAL_SRC_FILES := 静态库中.c文件名称
 				include $(BUILD_STATIC_LIBRARY)
-	0x03:	����Application.mk�ļ� ��д��������:
-				APP_MODULES := ��(��̬��̬)������
-	0x04:  	���뵱ǰĿ¼. ʹ��ndk-build������ļ�
+	0x02:	创建Application.mk文件 编写内容如下:
+				APP_MODULES := 库(静态或动态)的名称
+	0x03:  	进入当前目录. 使用ndk-build编译库文件
 	
-2,���ͨ����̬�����ɶ�̬��
-	0x01:
+2,如何通过静态库生成动态库
+	0x00: 将静态库.a文件和对应的头文件放在和准备生成的动态库文件在同一文件夹下
+	0x01: 编写动态库源码中的头文件和源文件，在源文件中include静态库的头文件
+	0x02: 创建Android.mk文件,编写内容如下:
+				LOCAL_PATH := $(call my-dir)
+
+				include $(CLEAR_VARS)
+				LOCAL_MODULE    := 静态库的名称
+				LOCAL_SRC_FILES := 静态库的.a文件
+				include $(PREBUILT_STATIC_LIBRARY)
+
+				include $(CLEAR_VARS)
+				LOCAL_MODULE    := 动态库的名称
+				LOCAL_STATIC_LIBRARIES := 静态库的名称
+				LOCAL_SRC_FILES := 动态库中.c文件名称
+
+				# 下面这段语句指明了要生成动态共享库
+				include $(BUILD_SHARED_LIBRARY) 
+	0x03:	创建Application.mk文件 编写内容如下:
+				APP_MODULES := 库(静态或动态)的名称
+	0x04:  	进入当前目录. 使用ndk-build编译库文件 (ndk-build已经配置到环境变量中了)
 	
-3,���ֱ�����ɶ�̬��
+3,如何直接生成动态库(android studio 开发环境下)
+	0x00: 在项目根目录下的local.properties文件中添加如下代码
+			ndk.dir = ndk-build所在目录
+	0x01: 在main目录下创建jni目录编写jni代码.
+	0x02: 配置gradle文件 在defaultConfig节点下
+		android.ndk {
+	        // 模块名称
+	        moduleName = "hello-jni"
+
+	        // 指定编译平台，更多平台信息 参见https://developer.android.com/ndk/guides/abis.html#sa
+	        abiFilters "armeabi", "armeabi-v7a"
+	        /*
+	         * Other ndk flags configurable here are
+	         * cppFlags.add("-fno-rtti")
+	         * cppFlags.add("-fno-exceptions")
+	         * ldLibs.addAll(["android", "log"])
+	         * stl       = "system"
+	         */
+    	}
