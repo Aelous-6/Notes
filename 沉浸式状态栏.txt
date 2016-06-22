@@ -1,0 +1,31 @@
+在android4.4版本开始，可以实现沉浸式状态栏效果:
+ 适配解决方案:
+ 	int stausBarColor = getResources().getColor(R.color. );
+
+ 	if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+ 		this.getWindow().setStatusBarColor(statusBarColor);
+ 	}else if(Build.VERSION.SDK-INT >= Build.VERSION_CODES.KITKAT){
+ 		//设置状态栏透明
+ 		this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+ 		//生成一个状态栏大小的矩形
+ 		View statusView = createStatusView(this,statusBarColor);
+ 		//添加statusView到布局中
+ 		ViewGroup decorView = (ViewGroup) this.getWindow().getDecorView();
+ 		decorView.addView(statusView);
+ 		//设置根布局的参数
+ 		ViewGroup rootView = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
+ 		rootView.setFitSystemWindows(true);
+ 	}
+
+ 	 private View createStatusView(Activity activity, int color) {
+ 	 	//获取状态栏高度
+ 	 	int resourceId = activity.getResource.getIdentifier("status_bar_height","dimen","android");
+ 	 	int statusBarHeight = activity.getResources().getDimensionPixelSize(resourceId);
+
+ 	 	//绘制一个和状态栏一样高的矩形
+ 	 	View statusView = new View(activity);
+ 	 	LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,statusBarHeight);
+ 	 	statusView.setLayoutParams(params);
+ 	 	statusView.setBackgroundColor(color);
+ 	 	return statusView;
+ 	 }

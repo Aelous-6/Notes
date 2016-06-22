@@ -1,0 +1,17 @@
+Android NDK开发
+1, 如何编译生成静态库(.a文件)
+	0x01:	编写静态库文件所需的.h,.c文件
+	0x02:   创建Android.mk文件 编写内容如下:
+				LOCAL_PATH := $(call my-dir)
+				include $(CLEAR_VARS)
+				LOCAL_MODULE    := 静态库的名称
+				LOCAL_SRC_FILES := 静态库中.c文件名称
+				include $(BUILD_STATIC_LIBRARY)
+	0x03:	创建Application.mk文件 编写内容如下:
+				APP_MODULES := 库(静态或动态)的名称
+	0x04:  	进入当前目录. 使用ndk-build编译库文件
+	
+2,如何通过静态库生成动态库
+	0x01:
+	
+3,如何直接生成动态库
