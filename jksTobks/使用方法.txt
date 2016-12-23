@@ -1,0 +1,9 @@
+1, 将bcprov-ext-jdk15on-151.jar 放到 jdk环境下的jre\lib\ext目录下
+2, keytool -importcert -trustcacerts -keystore e:\key.bks -file e:\server.crt -storetype BKS -provider org.bouncycastle.jce.provider.BouncyCastleProvider
+
+按照提示重复输入两次密码（在Java的KeyStore对象加载证书时会用到这个密码。），然后就成功将E:\目录下的server.crt转成key.bks证书。
+
+问题解决办法:
+	keytool 错误: java.lang.ClassNotFoundException: org.bouncycastle.jce.provider.BouncyCastleProvider
+
+    切换到java\lib\ext目录下. 执行 上面命令 +  -providerpath ./bcprov-ext-jdk15on-151.jar 
